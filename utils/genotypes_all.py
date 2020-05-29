@@ -25,8 +25,12 @@ PRIMITIVES = [
     'skip_connect', # identity
     'sep_conv_3x3',
     'sep_conv_5x5',
+    'sep_conv_m_3x3',
+    'sep_conv_m_5x5',
     'conv_3x3',
     'conv_5x5',
+    'dil_conv_3x3',#5
+    'dil_conv_5x5',#6
     'gab_filt_3x3',
     'dtp_blok_3x3',
     # 'gas_blok_3x3',
@@ -164,6 +168,24 @@ ABANDIT_CIFAR_1 = Genotype_6(
     e=[[('dtp_blok_3x3', 0)], [('sep_conv_5x5', 1)], [('sep_conv_3x3', 1)], [('avg_pool_3x3', 3)]], e_concat=range(1, 5),
     f=[[('gab_filt_3x3', 0)], [('conv_3x3', 0)], [('dtp_blok_3x3', 1)], [('avg_pool_3x3', 2)]], f_concat=range(1, 5))
 
+ABANDIT_MINIST_NORMAL_1 = Genotype_6(
+    a=[[('dil_conv_3x3', 0)], [('dil_conv_3x3', 0)], [('dil_conv_5x5', 2)], [('avg_pool_3x3', 0)]], a_concat=range(1, 5),
+    b=[[('skip_connect', 0)], [('sep_conv_m_3x3', 0)], [('sep_conv_m_5x5', 1)], [('max_pool_3x3', 1)]], b_concat=range(1, 5),
+    c=[[('sep_conv_m_3x3', 0)], [('sep_conv_m_5x5', 0)], [('skip_connect', 1)], [('sep_conv_m_3x3', 2)]], c_concat=range(1, 5),
+    d=[[('sep_conv_m_5x5', 0)], [('dil_conv_5x5', 1)], [('max_pool_3x3', 0)], [('max_pool_3x3', 1)]], d_concat=range(1, 5),
+    e=[[('max_pool_3x3', 0)], [('dil_conv_3x3', 0)], [('dil_conv_3x3', 0)], [('sep_conv_m_5x5', 1)]], e_concat=range(1, 5),
+    f=[[('dil_conv_3x3', 0)], [('sep_conv_m_3x3', 1)], [('dil_conv_5x5', 0)], [('dil_conv_5x5', 1)]], f_concat=range(1, 5))
+
+ABANDIT_MINIST_NORMAL_MANNUAL_1 = Genotype_6(
+    a=[[('skip_connect', 0)], [('dil_conv_3x3', 1)], [('max_pool_3x3', 2)], [('sep_conv_m_3x3', 1)]], a_concat=range(1, 5),
+    b=[[('avg_pool_3x3', 0)], [('skip_connect', 1)], [('avg_pool_3x3', 1)], [('sep_conv_m_5x5', 2)]], b_concat=range(1, 5),
+    c=[[('dil_conv_3x3', 0)], [('max_pool_3x3', 0)], [('sep_conv_m_5x5', 1)], [('dil_conv_3x3', 2)]], c_concat=range(1, 5),
+    d=[[('sep_conv_m_3x3', 0)], [('sep_conv_m_3x3', 0)], [('max_pool_3x3', 0)], [('max_pool_3x3', 0)]], d_concat=range(1, 5),
+    e=[[('avg_pool_3x3', 0)], [('sep_conv_m_5x5', 0)], [('dil_conv_3x3', 0)], [('sep_conv_m_3x3', 1)]], e_concat=range(1, 5),
+    f=[[('sep_conv_m_3x3', 0)], [('sep_conv_m_5x5', 1)], [('sep_conv_m_3x3', 0)], [('avg_pool_3x3', 2)]], f_concat=range(1, 5))
+
 genotype_array = {
     'ABANDIT_CIFAR_1': ABANDIT_CIFAR_1,
+    'ABANDIT_MINIST_NORMAL_1': ABANDIT_MINIST_NORMAL_1,
+    'ABANDIT_MINIST_NORMAL_MANNUAL_1': ABANDIT_MINIST_NORMAL_MANNUAL_1,
     }

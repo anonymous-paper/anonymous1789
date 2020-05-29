@@ -5,21 +5,24 @@ import numpy as np
 from tensorboardX import SummaryWriter
 import sys
 # setting the global param
-root_path = '/weight/chl/nas'
+root_path = './save'
 data_path = {
              'cifar10': '/data/CIFAR',
+             'mnist': '/data/mnist',
              }
 data_size = {
              'cifar10': '/data/CIFAR',
+             'mnist': '/data/mnist',
              }
 parser = argparse.ArgumentParser("train_parser")
 # data argument
-parser.add_argument('--data', type=str, default='cifar10', choices=['cifar10'], help='dataset')
+parser.add_argument('--data', type=str, default='cifar10', choices=['cifar10', 'mnist'], help='dataset')
 parser.add_argument('--batch_size', type=int, default=256, help='batch size') # 512
 parser.add_argument('--workers', type=int, default=0, help='worker to load the image') # 16
 parser.add_argument('--data_loader_type', type=str, default='torch', choices=['torch', 'dali'],
                     help='choose different data loader')
 parser.add_argument('--data_path_cifar', type=str, default='./data/CIFAR', help='date dir')
+parser.add_argument('--data_path_mnist', type=str, default='/data/mnist', help='date dir')
 # model
 parser.add_argument('--model', type=str, default='darts', choices=['darts'], help='model name')
 parser.add_argument('--init_channels', type=int, default=16, help='num of init channels') # 16
@@ -37,13 +40,14 @@ parser.add_argument('--bn_momentum', type=float, default=0.1)
 parser.add_argument('--bn_eps', type=float, default=1e-3)
 parser.add_argument('--no_decay_keys', type=str, default='bn', choices=[None, 'bn', 'bn#bias'])
 parser.add_argument('--no_nesterov', action='store_true')  # opt_param
+parser.add_argument('--no_mannul', action='store_false')
 
 # attacker flags:
 parser.add_argument('--nb_iter', help='Adversarial attack iteration', type=int, default=40)
 parser.add_argument('--eps', help='Adversarial attack maximal perturbation', type=float, default=0.3)
 parser.add_argument('--eps_iter', help='Adversarial attack step size', type=float, default=0.01)
 
-parser.add_argument('--root_path', type=str, default='./weight/chl/nas', help='save dir name')
+parser.add_argument('--root_path', type=str, default='./save', help='save dir name')
 parser.add_argument('--save', type=str, default='try', help='save dir name')
 parser.add_argument('--manual_seed', default=0, type=int)
 args = parser.parse_args()
@@ -51,6 +55,8 @@ args = parser.parse_args()
 root_path = args.root_path
 data_path['cifar10'] = args.data_path_cifar
 data_size['cifar10'] = args.data_path_cifar
+data_path['mnist'] = args.data_path_mnist
+data_size['mnist'] = args.data_path_mnist
 
 save_dir_str = args.data + '_' + args.model + '_' \
                + time.asctime(time.localtime()).replace(' ', '_') + '_' + args.model_name
@@ -101,9 +107,10 @@ def main():
     # print(genotype_array)
     genotype = genotype_array[args.model_name]
     
-    model_array = {'cifar10': NetworkCIFAR}
+    model_array = {'mnist': NetworkCIFAR,
+                   'cifar10': NetworkCIFAR}
     model = model_array[args.data](input_channels, args.init_channels, n_classes, args.layers, args.auxiliary, False, genotype,
-                                    input_size=input_size, dataset=args.data)
+                                    input_size=input_size, dataset=args.data, mannul=args.no_mannul)
     
     model.set_bn_param(args.bn_momentum, args.bn_eps)
     mb_params = utils.param_size(model)
@@ -120,20 +127,27 @@ def main():
 
     model_attack = model
 
-    attack_type = ['clean', 'fgsm']
-    attackers_val = [None]
-    for i in attack_type:
-        if i != 'clean':
-            attacker = attackers[i](model_attack, eps=args.eps, nb_iter=args.nb_iter, eps_iter=args.eps_iter)
-            attackers_val.append(attacker)
+    if args.data == 'cifar10':
+        attack_type = ['clean', 'fgsm']
+        attackers_val = [None]
+        for i in attack_type:
+            if i != 'clean':
+                attacker = attackers[i](model_attack, eps=args.eps, nb_iter=args.nb_iter, eps_iter=args.eps_iter)
+                attackers_val.append(attacker)
 
-    attack_type.append('pgd7')
-    attacker = attackers['pgd'](model_attack, eps=args.eps, nb_iter=7, eps_iter=args.eps_iter)
-    attackers_val.append(attacker)
+        attack_type.append('pgd7')
+        attacker = attackers['pgd'](model_attack, eps=args.eps, nb_iter=7, eps_iter=args.eps_iter)
+        attackers_val.append(attacker)
 
-    attack_type.append('pgd20')
-    attacker = attackers['pgd'](model_attack, eps=args.eps, nb_iter=20, eps_iter=args.eps_iter)
-    attackers_val.append(attacker)
+        attack_type.append('pgd20')
+        attacker = attackers['pgd'](model_attack, eps=args.eps, nb_iter=20, eps_iter=args.eps_iter)
+        attackers_val.append(attacker)
+    else:
+        attack_type = []
+        attackers_val = []
+        attack_type.append('pgd100')
+        attacker = attackers['pgd'](model_attack, eps=args.eps, nb_iter=100, eps_iter=args.eps_iter)
+        attackers_val.append(attacker)
 
     # validation
     for i, attacker_ in enumerate(attackers_val):

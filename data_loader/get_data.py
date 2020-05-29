@@ -213,6 +213,10 @@ def get_data(dataset, data_path, validation, attack=False):
         dset_cls = dset.CIFAR10
         input_channels = 3
         n_classes = 10
+    elif dataset == 'mnist':
+        dset_cls = dset.MNIST
+        input_channels = 1
+        n_classes = 10
     else:
         raise ValueError(dataset)
 

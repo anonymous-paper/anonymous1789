@@ -10,10 +10,22 @@ Here we provide our test codes and pretrained models.
 - PyTorch 1.0.0
 
 ## Run examples
-You need to modified your path to dataset using ```--data_path_cifar```.
+You need to modified your path to dataset using ```--data_path_cifar``` or ```data_path_mnist```.
 
 To evaluate the model in **CIFAR-10**, just run
 
 ```bash
 sh script/cifar10_darts_defense_all.sh
+```
+
+To evaluate the model in **MNIST** without denosing blocks, just run
+
+```bash
+sh script/mnist_darts_no.sh
+```
+
+To evaluate the model in **MNIST** with denosing block after searched cells, just run
+
+```bash
+sh script/mnist_darts_manual.sh
 ```

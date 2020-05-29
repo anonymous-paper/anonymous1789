@@ -38,7 +38,7 @@ class AuxiliaryHeadCIFAR(nn.Module):
 
 class NetworkCIFAR(MyModule):
 
-    def __init__(self, C_in, C, num_classes, layers, auxiliary, pcl, genotype, drop_out=0, drop_path=0, input_size=None, dataset=''):
+    def __init__(self, C_in, C, num_classes, layers, auxiliary, pcl, genotype, drop_out=0, drop_path=0, input_size=None, dataset='', mannul=True):
         super(NetworkCIFAR, self).__init__()
         self._layers = layers
         self._auxiliary = auxiliary
@@ -74,11 +74,12 @@ class NetworkCIFAR(MyModule):
             else:
                 reduction = False
 
-            # Denosing in 1/4, 2/4 and 3/4 layer.
-            if i in [layers // 4, 2 * layers // 4, 3 * layers // 4]:
-                denosing = True
-            else:
-                denosing = False
+            if mannul:
+                # Denosing in 1/4, 2/4 and 3/4 layer.
+                if i in [layers // 4, 2 * layers // 4, 3 * layers // 4]:
+                    denosing = True
+                else:
+                    denosing = False
 
             if proxy_len == self._layers:
                 k = i

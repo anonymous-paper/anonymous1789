@@ -14,6 +14,12 @@ def data_transforms(dataset, attack=False):
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
         ]
+    elif dataset == 'mnist':
+        MEAN = [0.13066051707548254]
+        STD = [0.30810780244715075]
+        transf = [
+            transforms.RandomAffine(degrees=15, translate=(0.1, 0.1), scale=(0.9, 1.1), shear=0.1)
+        ]
     else:
         raise ValueError('not expected dataset = {}'.format(dataset))
 
